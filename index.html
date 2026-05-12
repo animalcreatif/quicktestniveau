@@ -549,7 +549,7 @@
     const num = String(currentIndex + 1).padStart(2, '0');
     const total = String(QUESTIONS.length).padStart(2, '0');
 
-    document.getElementById('q-number').textContent = `Question ${num}`;
+    const FORM_ENDPOINT = 'https://formspree.io/f/TON_ID_FORMSPREE';
     document.getElementById('q-title').textContent = q.q;
     document.getElementById('progress-label').textContent = `${num} / ${total}`;
     document.getElementById('progress-bar').style.setProperty('--progress', currentIndex / QUESTIONS.length);
