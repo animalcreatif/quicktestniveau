@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ton niveau IA sur 10 | IALS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141212;
+    --surface-2: #1d1817;
+    --rose: #f2c2bc;
+    --rose-soft: #e8a8a0;
+    --rose-dim: rgba(242, 194, 188, 0.15);
+    --rose-line: rgba(242, 194, 188, 0.25);
+    --cream: #f5f0eb;
+    --cream-dim: rgba(245, 240, 235, 0.55);
+    --cream-line: rgba(245, 240, 235, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .quiz-wrapper {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 64px;
+  }
+
+  .brand-mark {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    color: var(--rose);
+  }
+
+  .progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--cream-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .progress-bar {
+    width: 120px;
+    height: 2px;
+    background: var(--cream-line);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--rose);
+    transform: scaleX(var(--progress, 0));
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .screen {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .screen.active {
+    display: flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Intro */
+  .intro-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 32px;
+    font-weight: 500;
+  }
+
+  .intro-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(48px, 8vw, 92px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--cream);
+    margin-bottom: 32px;
+  }
+
+  .intro-title .accent {
+    color: var(--rose);
+  }
+
+  .intro-meta {
+    font-size: 18px;
+    color: var(--cream-dim);
+    font-weight: 300;
+    margin-bottom: 48px;
+    max-width: 480px;
+  }
+
+  .intro-meta strong {
+    color: var(--cream);
+    font-weight: 500;
+  }
+
+  /* Question */
+  .q-number {
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+
+  .q-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 4.5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 40px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option {
+    background: var(--surface);
+    border: 1px solid var(--cream-line);
+    color: var(--cream);
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 400;
+    text-align: left;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option:hover {
+    background: var(--surface-2);
+    border-color: var(--rose-line);
+    transform: translateX(4px);
+  }
+
+  .option:active {
+    transform: translateX(4px) scale(0.99);
+  }
+
+  .option .marker {
+    color: var(--rose);
+    font-weight: 700;
+    margin-right: 12px;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+  }
+
+  /* Button */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--rose);
+    color: var(--bg);
+    border: none;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 18px 32px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    background: var(--cream);
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid var(--cream-line);
+  }
+
+  .btn-ghost:hover {
+    background: var(--surface);
+    border-color: var(--rose);
+    color: var(--rose);
+  }
+
+  .btn .arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .btn:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  /* Result */
+  .result-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .score-display {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+    margin: 24px 0 40px;
+  }
+
+  .score-number {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(120px, 22vw, 220px);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    color: var(--rose);
+  }
+
+  .score-total {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: clamp(40px, 8vw, 72px);
+    color: var(--cream-dim);
+    letter-spacing: -0.02em;
+  }
+
+  .result-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+    color: var(--cream);
+  }
+
+  .result-message {
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--cream-dim);
+    margin-bottom: 40px;
+    max-width: 520px;
+    font-weight: 300;
+  }
+
+  .result-message strong {
+    color: var(--cream);
+    font-weight: 500;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .restart {
+    margin-top: 32px;
+    background: none;
+    border: none;
+    color: var(--cream-dim);
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    padding: 8px 0;
+  }
+
+  .restart:hover {
+    color: var(--rose);
+  }
+
+  .footer-mark {
+    margin-top: auto;
+    padding-top: 64px;
+    font-size: 12px;
+    color: var(--cream-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .footer-mark .dot {
+    color: var(--rose);
+    margin: 0 8px;
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .quiz-wrapper { padding: 32px 20px 60px; }
+    .brand { margin-bottom: 40px; }
+    .progress-bar { width: 80px; }
+    .option { padding: 18px 20px; font-size: 15px; }
+    .intro-meta { font-size: 16px; }
+    .result-message { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrapper">
+
+  <div class="brand">
+    <div class="brand-mark">IALS</div>
+    <div class="progress" id="progress" style="visibility: hidden;">
+      <span id="progress-label">01 / 10</span>
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Intro -->
+  <section class="screen active" id="intro">
+    <div class="intro-eyebrow">Test express</div>
+    <h1 class="intro-title">Ton niveau<br>IA<br><span class="accent">sur 10.</span></h1>
+    <p class="intro-meta"><strong>10 questions. 2 minutes.</strong> Pas de leçon, pas de jugement. Juste une note (et une suggestion à la fin).</p>
+    <div>
+      <button class="btn" onclick="startQuiz()">
+        Commencer <span class="arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Questions -->
+  <section class="screen" id="question">
+    <div class="q-number" id="q-number">Question 01</div>
+    <h2 class="q-title" id="q-title"></h2>
+    <div class="options" id="q-options"></div>
+  </section>
+
+  <!-- Result -->
+  <section class="screen" id="result">
+    <div class="result-eyebrow">Ton score</div>
+    <div class="score-display">
+      <span class="score-number" id="score-number">0</span>
+      <span class="score-total">/10</span>
+    </div>
+    <h2 class="result-title" id="result-title"></h2>
+    <p class="result-message" id="result-message"></p>
+    <div class="result-actions" id="result-actions"></div>
+    <button class="restart" onclick="restart()">Refaire le test</button>
+  </section>
+
+  <div class="footer-mark">
+    IALS <span class="dot">●</span> Intelligence Artificielle La Suite
+  </div>
+
+</div>
+
+<script>
+  // === CONFIGURATION ===
+  // Liens à personnaliser
+  const LINKS = {
+    formations: 'https://nathaliedupuy.com/formations',
+    linkedin: 'https://www.linkedin.com/in/nathaliedupuy/'
+  };
+
+  const QUESTIONS = [
+    {
+      q: "Ta dernière session ChatGPT, Claude ou Mistral, c'était quand ?",
+      options: [
+        { text: "Jamais ouvert.", score: 0 },
+        { text: "Il y a plusieurs mois.", score: 1 },
+        { text: "Cette semaine.", score: 2 },
+        { text: "Aujourd'hui, plusieurs fois.", score: 3 }
+      ]
+    },
+    {
+      q: "Pour toi, un prompt c'est :",
+      options: [
+        { text: "Aucune idée.", score: 0 },
+        { text: "Une question posée à l'IA.", score: 1 },
+        { text: "Une instruction structurée avec contexte, rôle, contraintes.", score: 2 },
+        { text: "Une discipline avec ses méthodes (R.O.C.K.S.T.A.R., C.A.S.T.E.R., etc.).", score: 3 }
+      ]
+    },
+    {
+      q: "La génération d'image (Midjourney, DALL·E, Flux), tu en es où ?",
+      options: [
+        { text: "Jamais testé.", score: 0 },
+        { text: "J'ai vu passer des choses.", score: 1 },
+        { text: "J'ai déjà généré quelques images.", score: 2 },
+        { text: "Je connais les paramètres avancés : sref, sw, ar.", score: 3 }
+      ]
+    },
+    {
+      q: "Une « hallucination » d'IA, c'est :",
+      options: [
+        { text: "Quand on prend trop de café avant un prompt.", score: 0 },
+        { text: "Un bug d'affichage.", score: 1 },
+        { text: "L'IA qui invente une info fausse avec aplomb.", score: 2 },
+        { text: "Un phénomène lié à la génération probabiliste des LLM.", score: 3 }
+      ]
+    },
+    {
+      q: "Tu as déjà créé :",
+      options: [
+        { text: "Rien encore.", score: 0 },
+        { text: "Un prompt qui marche pas mal.", score: 1 },
+        { text: "Un GPT custom, un projet Claude, un agent.", score: 2 },
+        { text: "Un workflow IA complet (Make, n8n, automation).", score: 3 }
+      ]
+    },
+    {
+      q: "La vidéo IA (Veo, Sora, Kling, Runway), tu connais :",
+      options: [
+        { text: "C'est quoi ?", score: 0 },
+        { text: "J'ai vu des trucs sur LinkedIn.", score: 1 },
+        { text: "J'ai testé un ou plusieurs outils.", score: 2 },
+        { text: "Je sais structurer un prompt vidéo : caméra, lumière, mouvement.", score: 3 }
+      ]
+    },
+    {
+      q: "Si je dis « RAG », tu penses :",
+      options: [
+        { text: "À un vêtement.", score: 0 },
+        { text: "Aucune idée.", score: 1 },
+        { text: "Retrieval Augmented Generation, je vois.", score: 2 },
+        { text: "J'en ai déjà monté un sur mes données.", score: 3 }
+      ]
+    },
+    {
+      q: "La propriété intellectuelle face à l'IA générative :",
+      options: [
+        { text: "J'y ai jamais pensé.", score: 0 },
+        { text: "Je sais que c'est flou.", score: 1 },
+        { text: "Je connais les bases : CPI, AI Act, jurisprudence.", score: 2 },
+        { text: "Je suis les évolutions juridiques de près.", score: 3 }
+      ]
+    },
+    {
+      q: "Ton usage de l'IA au quotidien :",
+      options: [
+        { text: "Curieux·se mais j'observe.", score: 0 },
+        { text: "Quelques tâches ponctuelles.", score: 1 },
+        { text: "Plusieurs heures par semaine, c'est intégré.", score: 2 },
+        { text: "C'est mon métier ou ça structure tout mon travail.", score: 3 }
+      ]
+    },
+    {
+      q: "Si je te dis « agent IA » :",
+      options: [
+        { text: "Tu penses à James Bond.", score: 0 },
+        { text: "Tu en as entendu parler.", score: 1 },
+        { text: "Tu sais qu'un agent exécute des tâches multi-étapes.", score: 2 },
+        { text: "Tu en as déjà construit un.", score: 3 }
+      ]
+    }
+  ];
+
+  const TIERS = [
+    {
+      max: 3,
+      title: "Niveau débutant.",
+      message: "Tu démarres, c'est très bien. Le terrain est neuf, le potentiel est là. <strong>Je peux t'accompagner.</strong> Une formation, on en parle ?",
+      cta: { label: "Voir les formations IALS", href: 'formations', primary: true }
+    },
+    {
+      max: 7,
+      title: "Niveau intermédiaire.",
+      message: "Tu connais le terrain. Tes prompts tiennent la route, ta curiosité est intacte. <strong>Je peux t'accompagner.</strong> On muscle ta pratique, on passe au niveau pro.",
+      cta: { label: "Voir les formations IALS", href: 'formations', primary: true }
+    },
+    {
+      max: 10,
+      title: "Niveau expert.",
+      message: "Tu en sais plus que moi (ou presque). <strong>Tu es trop fort·e pour moi.</strong> Tu m'apprendras des choses. On se suit ?",
+      cta: { label: "Suivre Nathalie sur LinkedIn", href: 'linkedin', primary: true }
+    }
+  ];
+
+  // === LOGIQUE ===
+  let currentIndex = 0;
+  let answers = [];
+
+  const screens = {
+    intro: document.getElementById('intro'),
+    question: document.getElementById('question'),
+    result: document.getElementById('result')
+  };
+
+  function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    answers = [];
+    document.getElementById('progress').style.visibility = 'visible';
+    renderQuestion();
+    showScreen('question');
+  }
+
+  function renderQuestion() {
+    const q = QUESTIONS[currentIndex];
+    const num = String(currentIndex + 1).padStart(2, '0');
+    const total = String(QUESTIONS.length).padStart(2, '0');
+
+    document.getElementById('q-number').textContent = `Question ${num}`;
+    document.getElementById('q-title').textContent = q.q;
+    document.getElementById('progress-label').textContent = `${num} / ${total}`;
+    document.getElementById('progress-bar').style.setProperty('--progress', currentIndex / QUESTIONS.length);
+
+    const optionsHTML = q.options.map((opt, i) => {
+      const marker = String.fromCharCode(65 + i);
+      return `<button class="option" onclick="selectAnswer(${opt.score})"><span class="marker">${marker}</span>${opt.text}</button>`;
+    }).join('');
+
+    document.getElementById('q-options').innerHTML = optionsHTML;
+
+    // re-trigger animation
+    screens.question.style.animation = 'none';
+    void screens.question.offsetWidth;
+    screens.question.style.animation = 'fadeIn 0.5s ease';
+  }
+
+  function selectAnswer(score) {
+    answers.push(score);
+    currentIndex++;
+
+    if (currentIndex < QUESTIONS.length) {
+      renderQuestion();
+    } else {
+      document.getElementById('progress-bar').style.setProperty('--progress', 1);
+      setTimeout(showResult, 350);
+    }
+  }
+
+  function showResult() {
+    const total = answers.reduce((a, b) => a + b, 0);
+    const score = Math.round(total / 3);
+    const tier = TIERS.find(t => score <= t.max);
+
+    document.getElementById('result-title').textContent = tier.title;
+    document.getElementById('result-message').innerHTML = tier.message;
+
+    const ctaHTML = `
+      <a class="btn" href="${LINKS[tier.cta.href]}" target="_blank" rel="noopener">
+        ${tier.cta.label} <span class="arrow">→</span>
+      </a>
+      <button class="btn btn-ghost" onclick="shareScore(${score})">
+        Partager mon score
+      </button>
+    `;
+    document.getElementById('result-actions').innerHTML = ctaHTML;
+
+    showScreen('result');
+    animateScore(score);
+  }
+
+  function animateScore(target) {
+    const el = document.getElementById('score-number');
+    let current = 0;
+    const duration = 1200;
+    const start = performance.now();
+
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(eased * target);
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function shareScore(score) {
+    const text = `Mon niveau IA : ${score}/10 (testé chez IALS).`;
+    if (navigator.share) {
+      navigator.share({ title: 'Mon niveau IA', text, url: window.location.href }).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(`${text} ${window.location.href}`);
+      const btn = event.target;
+      const original = btn.textContent;
+      btn.textContent = 'Copié ✓';
+      setTimeout(() => { btn.textContent = original; }, 2000);
+    }
+  }
+
+  function restart() {
+    document.getElementById('progress').style.visibility = 'hidden';
+    document.getElementById('progress-bar').style.setProperty('--progress', 0);
+    showScreen('intro');
+  }
+</script>
+
+</body>
+</html>
