@@ -305,6 +305,112 @@
     flex-wrap: wrap;
   }
 
+  /* Capture screen */
+  .capture-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 4.5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .capture-subtitle {
+    font-size: 16px;
+    color: var(--cream-dim);
+    font-weight: 300;
+    margin-bottom: 40px;
+    max-width: 480px;
+  }
+
+  .field-group {
+    margin-bottom: 32px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  .field-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--cream-line);
+    color: var(--cream);
+    font-family: inherit;
+    font-size: 16px;
+    padding: 18px 20px;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .field-input::placeholder {
+    color: var(--cream-dim);
+  }
+
+  .field-input:focus {
+    border-color: var(--rose);
+    background: var(--surface-2);
+  }
+
+  .profile-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .profile-btn {
+    background: var(--surface);
+    border: 1px solid var(--cream-line);
+    color: var(--cream);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .profile-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--rose-line);
+  }
+
+  .profile-btn.selected {
+    background: var(--rose-dim);
+    border-color: var(--rose);
+    color: var(--rose);
+    font-weight: 500;
+  }
+
+  .btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn:disabled:hover {
+    background: var(--rose);
+    transform: none;
+  }
+
+  .privacy-note {
+    font-size: 12px;
+    color: var(--cream-dim);
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 600px) {
+    .profile-choices { grid-template-columns: 1fr; }
+  }
+
   .restart {
     margin-top: 32px;
     background: none;
@@ -367,9 +473,43 @@
     <h1 class="intro-title">Ton niveau<br>IA<br><span class="accent">sur 10.</span></h1>
     <p class="intro-meta"><strong>10 questions. 2 minutes.</strong> Pas de leçon, pas de jugement. Juste une note (et une suggestion à la fin).</p>
     <div>
-      <button class="btn" onclick="startQuiz()">
+      <button class="btn" onclick="goToCapture()">
         Commencer <span class="arrow">→</span>
       </button>
+    </div>
+  </section>
+
+  <!-- Capture email + profil -->
+  <section class="screen" id="capture">
+    <div class="intro-eyebrow">Avant de commencer</div>
+    <h2 class="capture-title">Deux infos rapides.</h2>
+    <p class="capture-subtitle">Pour t'envoyer ton score et te recontacter si ton profil colle à mes formations.</p>
+
+    <div class="field-group">
+      <label class="field-label" for="email-input">Ton email</label>
+      <input
+        type="email"
+        id="email-input"
+        class="field-input"
+        placeholder="toi@exemple.com"
+        autocomplete="email"
+        required
+      />
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Ton profil</label>
+      <div class="profile-choices">
+        <button type="button" class="profile-btn" data-profile="creatif" onclick="selectProfile('creatif')">Plutôt créatif·ve</button>
+        <button type="button" class="profile-btn" data-profile="pas-creatif" onclick="selectProfile('pas-creatif')">Plutôt pas créatif·ve</button>
+      </div>
+    </div>
+
+    <div>
+      <button class="btn" id="capture-submit" onclick="startQuiz()" disabled>
+        C'est parti <span class="arrow">→</span>
+      </button>
+      <p class="privacy-note">Email réservé à Nathalie Dupuy / IALS. Zéro spam, désinscription en 1 clic.</p>
     </div>
   </section>
 
@@ -404,8 +544,12 @@
   // Liens à personnaliser
   const LINKS = {
     formations: 'https://nathaliedupuy.com/formations',
-    linkedin: 'https://www.linkedin.com/in/nathaliedupuy/'
+    linkedin: 'https://www.linkedin.com/in/nathalie-dupuy-ia/'
   };
+
+  // Endpoint de réception des leads (Formspree, Web3Forms, Make webhook, etc.)
+  // Remplacer par ton vrai endpoint. Laisser tel quel désactive l'envoi.
+  const FORM_ENDPOINT = 'https://formspree.io/f/TON_ID_FORMSPREE';
 
   const QUESTIONS = [
     {
@@ -524,9 +668,12 @@
   // === LOGIQUE ===
   let currentIndex = 0;
   let answers = [];
+  let userEmail = '';
+  let userProfile = '';
 
   const screens = {
     intro: document.getElementById('intro'),
+    capture: document.getElementById('capture'),
     question: document.getElementById('question'),
     result: document.getElementById('result')
   };
@@ -536,7 +683,31 @@
     screens[name].classList.add('active');
   }
 
+  function goToCapture() {
+    showScreen('capture');
+    setTimeout(() => document.getElementById('email-input').focus(), 300);
+  }
+
+  function selectProfile(profile) {
+    userProfile = profile;
+    document.querySelectorAll('.profile-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.profile === profile);
+    });
+    validateCapture();
+  }
+
+  function validateCapture() {
+    const email = document.getElementById('email-input').value.trim();
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    document.getElementById('capture-submit').disabled = !(isValidEmail && userProfile);
+  }
+
+  document.getElementById('email-input').addEventListener('input', validateCapture);
+
   function startQuiz() {
+    userEmail = document.getElementById('email-input').value.trim();
+    if (!userEmail || !userProfile) return;
+
     currentIndex = 0;
     answers = [];
     document.getElementById('progress').style.visibility = 'visible';
@@ -549,7 +720,7 @@
     const num = String(currentIndex + 1).padStart(2, '0');
     const total = String(QUESTIONS.length).padStart(2, '0');
 
-    const FORM_ENDPOINT = 'https://formspree.io/f/TON_ID_FORMSPREE';
+    document.getElementById('q-number').textContent = `Question ${num}`;
     document.getElementById('q-title').textContent = q.q;
     document.getElementById('progress-label').textContent = `${num} / ${total}`;
     document.getElementById('progress-bar').style.setProperty('--progress', currentIndex / QUESTIONS.length);
@@ -599,6 +770,26 @@
 
     showScreen('result');
     animateScore(score);
+    submitLead(score, tier.title);
+  }
+
+  function submitLead(score, tierLabel) {
+    if (!FORM_ENDPOINT || FORM_ENDPOINT.includes('TON_ID')) return;
+
+    const payload = {
+      email: userEmail,
+      profil: userProfile,
+      score: `${score}/10`,
+      niveau: tierLabel.replace(/\.$/, ''),
+      date: new Date().toISOString(),
+      source: 'Quiz IALS niveau IA'
+    };
+
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
   }
 
   function animateScore(target) {
@@ -632,6 +823,11 @@
   function restart() {
     document.getElementById('progress').style.visibility = 'hidden';
     document.getElementById('progress-bar').style.setProperty('--progress', 0);
+    document.getElementById('email-input').value = '';
+    userProfile = '';
+    userEmail = '';
+    document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('capture-submit').disabled = true;
     showScreen('intro');
   }
 </script>

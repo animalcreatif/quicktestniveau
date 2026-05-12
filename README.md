@@ -23,13 +23,16 @@ Charte rose poudré sur noir. Inter Black pour les titres, Inter Light pour le c
 
 ## Personnalisation rapide
 
-Ouvre `index.html`, cherche le bloc `LINKS` (autour de la ligne 270). Remplace par tes vrais liens :
+Ouvre `index.html`, cherche le bloc de configuration (autour de la ligne 540). Trois choses à remplacer :
 
 ```js
 const LINKS = {
   formations: 'https://nathaliedupuy.com/formations',
-  linkedin: 'https://www.linkedin.com/in/nathaliedupuy/'
+  linkedin: 'https://www.linkedin.com/in/nathalie-dupuy-ia/'
 };
+
+// Endpoint de réception des leads
+const FORM_ENDPOINT = 'https://formspree.io/f/TON_ID_FORMSPREE';
 ```
 
 Tu peux aussi modifier directement :
@@ -37,6 +40,39 @@ Tu peux aussi modifier directement :
 - Les 10 questions dans le tableau `QUESTIONS`
 - Les messages de paliers dans `TIERS`
 - Les couleurs dans `:root` (CSS variables, tout en haut du `<style>`)
+
+---
+
+## Récupération des leads (email + profil)
+
+Le quiz capture l'email et le profil (créatif·ve / pas créatif·ve) au début, envoie le tout avec le score à la fin du test.
+
+### Option 1 : Formspree (recommandé pour démarrer)
+
+1. Crée un compte sur [formspree.io](https://formspree.io) (gratuit, 50 soumissions / mois).
+2. Crée un nouveau formulaire, récupère ton endpoint au format `https://formspree.io/f/XXXXX`.
+3. Colle-le dans `FORM_ENDPOINT` (ligne 552).
+4. Les leads arrivent dans ton dashboard Formspree + en notification email.
+
+### Option 2 : Make / Zapier webhook (lien direct Notion CRM)
+
+1. Crée un scénario Make ou un Zap déclenché par un webhook.
+2. Connecte la sortie à ta base Notion `CRM Commercial IALS`.
+3. Colle l'URL du webhook dans `FORM_ENDPOINT`.
+4. Chaque lead arrive automatiquement dans ton CRM, avec email, profil, score, niveau, date.
+
+### Payload envoyé
+
+```json
+{
+  "email": "toi@exemple.com",
+  "profil": "creatif",
+  "score": "7/10",
+  "niveau": "Niveau intermédiaire",
+  "date": "2026-05-12T14:30:00.000Z",
+  "source": "Quiz IALS niveau IA"
+}
+```
 
 ---
 
