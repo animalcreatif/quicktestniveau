@@ -8,13 +8,14 @@ Hébergé en HTML pur. Zéro dépendance. Embarquable n'importe où.
 
 ## Aperçu
 
-Trois écrans : intro, questions, résultat.
+Quatre écrans : intro, capture email + profil, questions, résultat.
+
 Trois paliers de scoring :
 
 ```
-0 à 3   →   Niveau débutant      →   CTA Formations IALS
-4 à 7   →   Niveau intermédiaire →   CTA Formations IALS
-8 à 10  →   Niveau expert        →   CTA LinkedIn
+0 à 4   →   Niveau débutant      →   CTA Site IALS
+5 à 9   →   Niveau intermédiaire →   CTA Site IALS
+10      →   Niveau expert        →   CTA LinkedIn
 ```
 
 Charte rose poudré sur noir. Inter Black pour les titres, Inter Light pour le corps. Animations CSS uniquement.
@@ -23,45 +24,37 @@ Charte rose poudré sur noir. Inter Black pour les titres, Inter Light pour le c
 
 ## Personnalisation rapide
 
-Ouvre `index.html`, cherche le bloc de configuration (autour de la ligne 540). Trois choses à remplacer :
+Ouvre `index.html`, cherche le bloc de configuration autour de la ligne 545. Trois choses à ajuster selon ton setup :
 
 ```js
 const LINKS = {
-  formations: 'https://nathaliedupuy.com/formations',
+  formations: 'https://www.nathaliedupuy.com',
   linkedin: 'https://www.linkedin.com/in/nathalie-dupuy-ia/'
 };
 
-// Endpoint de réception des leads
-const FORM_ENDPOINT = 'https://formspree.io/f/TON_ID_FORMSPREE';
+// Endpoint de réception des leads (Make webhook, Formspree, etc.)
+const FORM_ENDPOINT = 'https://hook.eu1.make.com/TON_WEBHOOK_ID';
 ```
 
 Tu peux aussi modifier directement :
 
 - Les 10 questions dans le tableau `QUESTIONS`
-- Les messages de paliers dans `TIERS`
+- Les messages et seuils de paliers dans `TIERS`
 - Les couleurs dans `:root` (CSS variables, tout en haut du `<style>`)
 
 ---
 
 ## Récupération des leads (email + profil)
 
-Le quiz capture l'email et le profil (créatif·ve / pas créatif·ve) au début, envoie le tout avec le score à la fin du test.
+Le quiz capture l'email et le profil (créatif·ve / pas créatif·ve) avant les questions, envoie le tout avec le score à la fin du test vers ton endpoint.
 
-### Option 1 : Formspree (recommandé pour démarrer)
+### Setup actuel : Make webhook vers Notion
 
-1. Crée un compte sur [formspree.io](https://formspree.io) (gratuit, 50 soumissions / mois).
-2. Crée un nouveau formulaire, récupère ton endpoint au format `https://formspree.io/f/XXXXX`.
-3. Colle-le dans `FORM_ENDPOINT` (ligne 552).
-4. Les leads arrivent dans ton dashboard Formspree + en notification email.
+1. Webhook Make écoute en permanence l'URL configurée dans `FORM_ENDPOINT`.
+2. Module Notion `Create a Data Source Item` crée une ligne dans la base `Leads Quiz IA`.
+3. Scénario activé en mode `Immediately as data arrives`, traitement en temps réel.
 
-### Option 2 : Make / Zapier webhook (lien direct Notion CRM)
-
-1. Crée un scénario Make ou un Zap déclenché par un webhook.
-2. Connecte la sortie à ta base Notion `CRM Commercial IALS`.
-3. Colle l'URL du webhook dans `FORM_ENDPOINT`.
-4. Chaque lead arrive automatiquement dans ton CRM, avec email, profil, score, niveau, date.
-
-### Payload envoyé
+### Payload envoyé par le quiz
 
 ```json
 {
@@ -74,6 +67,19 @@ Le quiz capture l'email et le profil (créatif·ve / pas créatif·ve) au début
 }
 ```
 
+### Structure de la base Notion `Leads Quiz IA`
+
+| Propriété     | Type        | Mapping webhook         |
+|---------------|-------------|-------------------------|
+| Email         | Titre       | `email`                 |
+| Profil        | Sélection   | `profil` (Map ON)       |
+| Score         | Texte       | `score`                 |
+| Niveau        | Sélection   | `niveau` (Map ON)       |
+| Date capture  | Date        | `date` → Start          |
+| Source        | Sélection   | `Quiz IALS niveau IA`   |
+| Statut        | Sélection   | `Nouveau` (fixe)        |
+| Notes         | Texte       | vide (suivi manuel)     |
+
 ---
 
 ## Déploiement GitHub Pages
@@ -81,26 +87,39 @@ Le quiz capture l'email et le profil (créatif·ve / pas créatif·ve) au début
 Méthode la plus simple : un repo public, GitHub Pages activé sur la branche `main`.
 
 ```bash
-# 1. Créer le repo en local
 git init
 git add .
 git commit -m "init quiz IALS"
-
-# 2. Le pousser sur GitHub (créer d'abord le repo vide sur github.com)
 git branch -M main
-git remote add origin https://github.com/TON-USER/quiz-niveau-ia.git
+git remote add origin https://github.com/TON-USER/NOM-DU-REPO.git
 git push -u origin main
 ```
 
 Ensuite sur GitHub : **Settings → Pages → Source : Deploy from a branch → Branch : main / root**. Sauvegarder.
 
-Une à deux minutes plus tard, ton quiz est en ligne à l'adresse :
+Une à deux minutes plus tard, ton quiz est en ligne à :
 
 ```
-https://TON-USER.github.io/quiz-niveau-ia/
+https://TON-USER.github.io/NOM-DU-REPO/
 ```
 
-Pour brancher un sous-domaine type `quiz.nathaliedupuy.com` : ajouter un fichier `CNAME` à la racine contenant la valeur du sous-domaine, puis configurer un enregistrement CNAME chez ton registrar pointant vers `TON-USER.github.io`.
+Pour brancher un sous-domaine type `quiz.nathaliedupuy.com` : ajouter un fichier `CNAME` à la racine contenant le sous-domaine, puis configurer un enregistrement CNAME chez ton registrar pointant vers `TON-USER.github.io`.
+
+---
+
+## Mise à jour des fichiers
+
+Tu peux éditer directement sur GitHub (crayon ✏️ sur le fichier, modifie, Commit changes). GitHub Pages redéploie dans la minute.
+
+Pour des modifs plus lourdes, en local :
+
+```bash
+git pull
+# ... édite tes fichiers ...
+git add .
+git commit -m "ce que tu as changé"
+git push
+```
 
 ---
 

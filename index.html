@@ -543,21 +543,21 @@
   // === CONFIGURATION ===
   // Liens à personnaliser
   const LINKS = {
-    formations: 'https://nathaliedupuy.com',
+    formations: 'https://www.nathaliedupuy.com',
     linkedin: 'https://www.linkedin.com/in/nathalie-dupuy-ia/'
   };
 
   // Endpoint de réception des leads (Formspree, Web3Forms, Make webhook, etc.)
   // Remplacer par ton vrai endpoint. Laisser tel quel désactive l'envoi.
-  const FORM_ENDPOINT = 'https://hook.eu1.make.com/cehjbhiyq46btpaqld4css9batxsxrlo';
+  const FORM_ENDPOINT = 'https://formspree.io/f/TON_ID_FORMSPREE';
 
   const QUESTIONS = [
     {
       q: "Ta dernière session ChatGPT, Claude ou Mistral, c'était quand ?",
       options: [
         { text: "Jamais ouvert.", score: 0 },
-        { text: "Il y a plusieurs mois.", score: 1 },
         { text: "Cette semaine.", score: 2 },
+        { text: "Il y a plusieurs mois.", score: 1 },
         { text: "Aujourd'hui, plusieurs fois.", score: 3 }
       ]
     },
@@ -565,94 +565,94 @@
       q: "Pour toi, un prompt c'est :",
       options: [
         { text: "Aucune idée.", score: 0 },
+        { text: "Une discipline avec ses méthodes (R.O.C.K.S.T.A.R., C.A.S.T.E.R., etc.).", score: 3 },
         { text: "Une question posée à l'IA.", score: 1 },
-        { text: "Une instruction structurée avec contexte, rôle, contraintes.", score: 2 },
-        { text: "Une discipline avec ses méthodes (R.O.C.K.S.T.A.R., C.A.S.T.E.R., etc.).", score: 3 }
+        { text: "Une instruction structurée avec contexte, rôle, contraintes.", score: 2 }
       ]
     },
     {
-      q: "La génération d'image (Midjourney, DALL·E, Flux), tu en es où ?",
+      q: "La génération d'image (Midjourney, Flux, Imagen), tu en es où ?",
       options: [
-        { text: "Jamais testé.", score: 0 },
         { text: "J'ai vu passer des choses.", score: 1 },
+        { text: "Je connais les paramètres avancés : sref, ar, omni...", score: 3 },
         { text: "J'ai déjà généré quelques images.", score: 2 },
-        { text: "Je connais les paramètres avancés : sref, sw, ar.", score: 3 }
+        { text: "Jamais testé.", score: 0 }
       ]
     },
     {
       q: "Une « hallucination » d'IA, c'est :",
       options: [
+        { text: "Un phénomène lié à la génération probabiliste des LLM.", score: 3 },
         { text: "Quand on prend trop de café avant un prompt.", score: 0 },
-        { text: "Un bug d'affichage.", score: 1 },
         { text: "L'IA qui invente une info fausse avec aplomb.", score: 2 },
-        { text: "Un phénomène lié à la génération probabiliste des LLM.", score: 3 }
+        { text: "Un bug d'affichage.", score: 1 }
       ]
     },
     {
       q: "Tu as déjà créé :",
       options: [
-        { text: "Rien encore.", score: 0 },
         { text: "Un prompt qui marche pas mal.", score: 1 },
-        { text: "Un GPT custom, un projet Claude, un agent.", score: 2 },
-        { text: "Un workflow IA complet (Make, n8n, automation).", score: 3 }
+        { text: "Rien encore.", score: 0 },
+        { text: "Un workflow IA complet (Make, n8n, automation).", score: 3 },
+        { text: "Un GPT custom, un projet Claude, un agent.", score: 2 }
       ]
     },
     {
-      q: "La vidéo IA (Veo, Sora, Kling, Runway), tu connais :",
+      q: "La vidéo IA (Veo, Kling, Runway), tu connais :",
       options: [
         { text: "C'est quoi ?", score: 0 },
-        { text: "J'ai vu des trucs sur LinkedIn.", score: 1 },
         { text: "J'ai testé un ou plusieurs outils.", score: 2 },
-        { text: "Je sais structurer un prompt vidéo : caméra, lumière, mouvement.", score: 3 }
+        { text: "Je sais structurer un prompt vidéo : caméra, lumière...", score: 3 },
+        { text: "Oui, j'ai vu des trucs sur LinkedIn, jamais testé.", score: 1 }
       ]
     },
     {
       q: "Si je dis « RAG », tu penses :",
       options: [
-        { text: "À un vêtement.", score: 0 },
-        { text: "Aucune idée.", score: 1 },
+        { text: "À un vêtement, mais moche !", score: 0 },
         { text: "Retrieval Augmented Generation, je vois.", score: 2 },
+        { text: "Aucune idée.", score: 1 },
         { text: "J'en ai déjà monté un sur mes données.", score: 3 }
       ]
     },
     {
       q: "La propriété intellectuelle face à l'IA générative :",
       options: [
-        { text: "J'y ai jamais pensé.", score: 0 },
         { text: "Je sais que c'est flou.", score: 1 },
-        { text: "Je connais les bases : CPI, AI Act, jurisprudence.", score: 2 },
-        { text: "Je suis les évolutions juridiques de près.", score: 3 }
+        { text: "Je suis les évolutions juridiques de près.", score: 3 },
+        { text: "Je connais les bases.", score: 2 },
+        { text: "J'y ai jamais pensé.", score: 0 }
       ]
     },
     {
       q: "Ton usage de l'IA au quotidien :",
       options: [
-        { text: "Curieux·se mais j'observe.", score: 0 },
         { text: "Quelques tâches ponctuelles.", score: 1 },
-        { text: "Plusieurs heures par semaine, c'est intégré.", score: 2 },
-        { text: "C'est mon métier ou ça structure tout mon travail.", score: 3 }
+        { text: "Curieux·se mais j'observe.", score: 0 },
+        { text: "C'est mon métier ou ça structure tout mon travail.", score: 3 },
+        { text: "Plusieurs heures par semaine, c'est intégré.", score: 2 }
       ]
     },
     {
       q: "Si je te dis « agent IA » :",
       options: [
-        { text: "Tu penses à James Bond.", score: 0 },
-        { text: "Tu en as entendu parler.", score: 1 },
+        { text: "Tu en as déjà construit un.", score: 3 },
         { text: "Tu sais qu'un agent exécute des tâches multi-étapes.", score: 2 },
-        { text: "Tu en as déjà construit un.", score: 3 }
+        { text: "Tu penses à James Bond.", score: 0 },
+        { text: "Tu en as entendu parler.", score: 1 }
       ]
     }
   ];
 
   const TIERS = [
     {
-      max: 3,
+      max: 4,
       title: "Niveau débutant.",
       message: "Tu démarres, c'est très bien. Le terrain est neuf, le potentiel est là. <strong>Je peux t'accompagner.</strong> Une formation, on en parle ?",
       cta: { label: "Voir les formations IALS", href: 'formations', primary: true }
     },
     {
-      max: 7,
+      max: 9,
       title: "Niveau intermédiaire.",
       message: "Tu connais le terrain. Tes prompts tiennent la route, ta curiosité est intacte. <strong>Je peux t'accompagner.</strong> On muscle ta pratique, on passe au niveau pro.",
       cta: { label: "Voir les formations IALS", href: 'formations', primary: true }
